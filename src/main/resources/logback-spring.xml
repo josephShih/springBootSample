@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration  scan="true" scanPeriod="60 seconds" debug="false">
+    <contextName>be-studentPassport</contextName>
+    <property name="LOG_PATTERN" value ="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}:%L %M - %msg%n"></property>
+    <property name="LOG_FILE_PATH" value="logs/"></property>
+    <!--輸出到Console-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <!-- 輸出到檔案 -->
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+    		<fileNamePattern>${LOG_FILE_PATH}/%d{yyyy-MM-dd,aux}/logback.error.%d{yyyy-MM-dd}.log</fileNamePattern>
+    	</rollingPolicy>
+    	<!-- 設定寫入 log file 的格式設定  -->
+    	<encoder>
+    		<charset>utf-8</charset>
+    		<!-- 15:32:01.984 be-studentPassport [http-nio-8080-exec-1] ERROR c.e.s.controller.AuthController - error message  -->
+    		<pattern>%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+    	</encoder>
+    	<filter class="ch.qos.logback.classic.filter.LevelFilter">
+    		<level>error</level>
+    		<onMatch>ACCEPT</onMatch>
+    		<onMismatch>DENY</onMismatch>
+    	</filter>
+    </appender>
+    <!-- 透過 AsyncAppender 使 Log 可以以非同步的方式輸出，以增加寫入效能 -->
+    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 修改 queue 的大小，這個執會影響非同步寫入時的效能 -->
+        <queueSize>512</queueSize>
+        <!-- 載入名字為 error 的 <appender> -->
+        <appender-ref ref="error" />
+    </appender>
+    
+    <!-- 預設值(例外也會印出) -->
+    <root level="INFO"> 
+  		<appender-ref ref="console" />
+  		<!-- <appender-ref ref="error" /> -->
+  		<appender-ref ref="ASYNC" />
+ 	</root>
+ 	
+</configuration>
